@@ -4,12 +4,14 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Browser;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,6 +23,8 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.Scanner;
 
+import br.com.manygames.agenda.adapter.AlunosAdapter;
+import br.com.manygames.agenda.converter.AlunoConversor;
 import br.com.manygames.agenda.dao.AlunoDAO;
 import br.com.manygames.agenda.modelo.Aluno;
 
@@ -47,6 +51,15 @@ public class ListaAlunosActivity extends AppCompatActivity {
             }
         });
 
+        Button novoAluno = findViewById(R.id.novo_aluno);
+        novoAluno.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent vaiProForm = new Intent(ListaAlunosActivity.this, FormularioActivity.class);
+                startActivity(vaiProForm);
+            }
+        });
+
         registerForContextMenu(listaAlunos);
     }
 
@@ -54,7 +67,8 @@ public class ListaAlunosActivity extends AppCompatActivity {
         AlunoDAO dao = new AlunoDAO(this);
         List<Aluno> alunos = dao.buscaAlunos();
 
-        ArrayAdapter<Aluno> adapter = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, alunos);
+        AlunosAdapter adapter = new AlunosAdapter(this, alunos);
+        //ArrayAdapter<Aluno> adapter = new ArrayAdapter<Aluno>(this, R.layout.item_lista, alunos);
         listaAlunos.setAdapter(adapter);
     }
 
@@ -62,6 +76,22 @@ public class ListaAlunosActivity extends AppCompatActivity {
     protected void onResume() {
         carregaLista();
         super.onResume();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_lista_alunos, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_enviar_notas:
+                new EnviaAlunosTask(this).execute();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
