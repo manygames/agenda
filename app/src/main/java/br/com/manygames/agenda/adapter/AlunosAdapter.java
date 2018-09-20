@@ -66,6 +66,15 @@ public class AlunosAdapter extends BaseAdapter {
             campoFoto.setImageBitmap(bitmapTratado);
             campoFoto.setScaleType(ImageView.ScaleType.FIT_XY);
         }
+
+        TextView campoEndereco = view.findViewById(R.id.item_lista_endereco);
+        if(campoEndereco != null)
+            campoEndereco.setText(aluno.getEndereco());
+
+        TextView campoSite = view.findViewById(R.id.item_lista_site);
+        if(campoSite != null)
+            campoSite.setText(aluno.getSite());
+
         return view;
     }
 }
