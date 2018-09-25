@@ -1,9 +1,13 @@
 package br.com.manygames.agenda.modelo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.sql.Blob;
 
 public class Aluno implements Serializable{
+
+    @JsonProperty("idCliente")
     private Long id;
     private String nome;
     private String endereco;

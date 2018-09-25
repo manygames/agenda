@@ -15,7 +15,7 @@ import br.com.manygames.agenda.modelo.Aluno;
 public class AlunoDAO extends SQLiteOpenHelper{
 
     public AlunoDAO(Context context) {
-        super(context, "Agenda", null, 2);
+        super(context, "Agenda", null, 3);
     }
 
     @Override
@@ -38,16 +38,35 @@ public class AlunoDAO extends SQLiteOpenHelper{
             case 1:
                 sql = "ALTER TABLE Alunos ADD COLUMN caminhoFoto TEXT";
                 db.execSQL(sql);
+            case 2:
+                String novaTabela = "CREATE TABLE Alunos_novo " +
+                        "(id CHAR(36) PRIMARY KEY, " +
+                        "nome TEXT NOT NULL, " +
+                        "endereco TEXT, " +
+                        "telefone TEXT, " +
+                        "site TEXT, " +
+                        "nota REAL, " +
+                        "caminhoFoto TEXT)";
+                db.execSQL(novaTabela);
+
+                String migraTabela = "INSERT INTO Alunos_novo " +
+                        "(id, nome, endereco, telefone, site, nota, caminhoFoto)" +
+                        "SELECT id, nome, endereco, telefone, site, nota, caminhoFoto FROM Alunos";
+                db.execSQL(migraTabela);
+
+                String removeTabelaAntiga = "DROP TABLE Alunos";
+                db.execSQL(removeTabelaAntiga);
+
+                String alteraNomeTabela = "ALTER TABLE Alunos_novo RENAME TO Alunos";
+                db.execSQL(alteraNomeTabela);
         }
-
-
-
     }
 
     public void insere(Aluno aluno) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues dados = pegaDadosDoAluno(aluno);
-        db.insert("Alunos", null, dados);
+        long id = db.insert("Alunos", null, dados);
+        aluno.setId(id);
     }
 
     public List<Aluno> buscaAlunos() {

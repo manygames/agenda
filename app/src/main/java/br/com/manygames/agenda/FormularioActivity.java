@@ -2,8 +2,6 @@ package br.com.manygames.agenda;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,12 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import java.io.File;
 
 import br.com.manygames.agenda.dao.AlunoDAO;
 import br.com.manygames.agenda.modelo.Aluno;
+import br.com.manygames.agenda.retrofit.RetroFitInicializador;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FormularioActivity extends AppCompatActivity {
     public static final int CODIGO_CAMERA = 567;
@@ -77,11 +78,23 @@ public class FormularioActivity extends AppCompatActivity {
 
                 if(aluno.getId() != null) {
                     dao.altera(aluno);
-                    Log.v("weber", "alterou");
                 } else {
                     dao.insere(aluno);
-                    Log.v("weber", "inseriu");
                 }
+
+                //new InsereAlunoTask(aluno).execute();
+                Call call = new RetroFitInicializador().getAlunoService().insere(aluno);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        Log.i("Response", "sucesso");
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+                        Log.e("Failure", "Falhou");
+                    }
+                });
 
                 dao.close();
                 finish();

@@ -13,7 +13,7 @@ public class AlunoConversor {
         JSONStringer js = new JSONStringer();
         try {
             js.object().key("list").array().object().key("aluno").array();
-            for(Aluno aluno : alunos){
+            for (Aluno aluno : alunos) {
                 js.object();
                 js.key("nome").value(aluno.getNome());
                 js.key("nota").value(aluno.getNota());
