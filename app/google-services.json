@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "90967633117",
+    "firebase_url": "https://android-sync-5e2cc.firebaseio.com",
+    "project_id": "android-sync-5e2cc",
+    "storage_bucket": "android-sync-5e2cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:90967633117:android:585531be66b87cbb",
+        "android_client_info": {
+          "package_name": "br.com.manygames.agenda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "90967633117-spoge2rorrqkl56rhs66615qptb1sa5h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.manygames.agenda",
+            "certificate_hash": "7d96e431033fe768ef291016fc5b3a8c75a48226"
+          }
+        },
+        {
+          "client_id": "90967633117-eebcn107imrbl5863cgglcsae5i85aal.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiqmV8LjtFTpZFc8cWqs_8CFwFyvP_YVc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "90967633117-eebcn107imrbl5863cgglcsae5i85aal.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
