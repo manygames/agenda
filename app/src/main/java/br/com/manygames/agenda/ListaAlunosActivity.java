@@ -18,11 +18,16 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import br.com.manygames.agenda.adapter.AlunosAdapter;
 import br.com.manygames.agenda.dao.AlunoDAO;
 import br.com.manygames.agenda.dto.AlunoSync;
+import br.com.manygames.agenda.event.AtualizaListaAlunoEvent;
 import br.com.manygames.agenda.modelo.Aluno;
 import br.com.manygames.agenda.retrofit.RetroFitInicializador;
 import retrofit2.Call;
@@ -33,10 +38,13 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     private ListView listaAlunos;
     private SwipeRefreshLayout swipe;
+    private EventBus bus;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
+
+        bus = EventBus.getDefault();
 
         swipe = findViewById(R.id.lista_alunos_swipe);
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -91,6 +99,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        bus.register(this);
         carregaLista();
     }
 
@@ -209,4 +218,16 @@ public class ListaAlunosActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bus.unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void atualizaListaAlunosEvent(AtualizaListaAlunoEvent event){
+        carregaLista();
+    }
+
 }

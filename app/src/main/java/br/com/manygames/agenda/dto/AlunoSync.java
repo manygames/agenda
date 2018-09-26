@@ -8,7 +8,6 @@ public class AlunoSync {
     private List<Aluno> alunos;
     private String momentoDaUltimaModificacao;
 
-
     public List<Aluno> getAlunos() {
         return alunos;
     }

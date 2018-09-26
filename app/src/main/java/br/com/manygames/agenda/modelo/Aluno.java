@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.sql.Blob;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Aluno implements Serializable{
+public class Aluno implements Serializable {
     private String id;
     private String nome;
     private String endereco;
@@ -15,6 +15,7 @@ public class Aluno implements Serializable{
     private String site;
     private Double nota;
     private String caminhoFoto;
+    private int desativado;
 
     public String getId() {
         return id;
@@ -75,5 +76,17 @@ public class Aluno implements Serializable{
 
     public void setCaminhoFoto(String caminhoFoto) {
         this.caminhoFoto = caminhoFoto;
+    }
+
+    public int getDesativado() {
+        return desativado;
+    }
+
+    public void setDesativado(int desativado) {
+        this.desativado = desativado;
+    }
+
+    public boolean estaDesativado() {
+        return desativado == 1;
     }
 }

@@ -1,6 +1,7 @@
 package br.com.manygames.agenda.retrofit;
 
 import br.com.manygames.agenda.services.AlunoService;
+import br.com.manygames.agenda.services.DispositivoService;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -26,5 +27,9 @@ public class RetroFitInicializador {
 
     public AlunoService getAlunoService() {
         return retrofit.create(AlunoService.class);
+    }
+
+    public DispositivoService getDispositivoService() {
+        return retrofit.create(DispositivoService.class);
     }
 }
