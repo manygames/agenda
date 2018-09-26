@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -26,19 +25,17 @@ import java.util.List;
 
 import br.com.manygames.agenda.adapter.AlunosAdapter;
 import br.com.manygames.agenda.dao.AlunoDAO;
-import br.com.manygames.agenda.dto.AlunoSync;
 import br.com.manygames.agenda.event.AtualizaListaAlunoEvent;
 import br.com.manygames.agenda.modelo.Aluno;
-import br.com.manygames.agenda.retrofit.RetroFitInicializador;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import br.com.manygames.agenda.sync.AlunoSincronizador;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
+    private final AlunoSincronizador sincronizador = new AlunoSincronizador(this);
     private ListView listaAlunos;
     private SwipeRefreshLayout swipe;
     private EventBus bus;
+    private Aluno aluno;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +47,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                buscaAlunos();
+                sincronizador.buscaTodos();
             }
         });
 
@@ -79,7 +76,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
         });
 
         registerForContextMenu(listaAlunos);
-        buscaAlunos();
+        sincronizador.buscaTodos();
     }
 
     private void carregaLista() {
@@ -88,7 +85,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
         for (Aluno aluno :
              alunos) {
-            Log.i("Id do aluno", String.valueOf(aluno.getId()));
+            Log.i("Aluno Sync", String.valueOf(aluno.getSincronizado()));
         }
         
         AlunosAdapter adapter = new AlunosAdapter(this, alunos);
@@ -101,27 +98,6 @@ public class ListaAlunosActivity extends AppCompatActivity {
         super.onResume();
         bus.register(this);
         carregaLista();
-    }
-
-    private void buscaAlunos() {
-        Call<AlunoSync> call = new RetroFitInicializador().getAlunoService().lista();
-        call.enqueue(new Callback<AlunoSync>() {
-            @Override
-            public void onResponse(Call<AlunoSync> call, Response<AlunoSync> response) {
-                AlunoSync alunoSync = response.body();
-                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                dao.sincroniza(alunoSync.getAlunos());
-                dao.close();
-                carregaLista();
-                swipe.setRefreshing(false);
-            }
-
-            @Override
-            public void onFailure(Call<AlunoSync> call, Throwable t) {
-                swipe.setRefreshing(false);
-                Log.e("onFailure: ", t.getMessage());
-            }
-        });
     }
 
     @Override
@@ -151,7 +127,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        final Aluno aluno = (Aluno) listaAlunos.getItemAtPosition(info.position);
+        aluno = (Aluno) listaAlunos.getItemAtPosition(info.position);
 
 
         MenuItem ligar = menu.add("Ligar");
@@ -198,22 +174,13 @@ public class ListaAlunosActivity extends AppCompatActivity {
         deletar.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                Call<Void> call = new RetroFitInicializador().getAlunoService().deleta(aluno.getId());
-                call.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        Aluno aluno = (Aluno) listaAlunos.getItemAtPosition(info.position);
-                        AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                        dao.deleta(aluno);
-                        dao.close();
-                        carregaLista();
-                    }
 
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(ListaAlunosActivity.this, "Não foi possível remover o aluno", Toast.LENGTH_LONG);
-                    }
-                });
+                AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
+                dao.deleta(aluno);
+                dao.close();
+                carregaLista();
+
+                sincronizador.deleta(aluno);
                 return false;
             }
         });
@@ -227,6 +194,8 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void atualizaListaAlunosEvent(AtualizaListaAlunoEvent event){
+        if(swipe.isRefreshing())
+            swipe.setRefreshing(false);
         carregaLista();
     }
 

@@ -12,6 +12,7 @@ import java.util.Map;
 import br.com.manygames.agenda.dao.AlunoDAO;
 import br.com.manygames.agenda.dto.AlunoSync;
 import br.com.manygames.agenda.event.AtualizaListaAlunoEvent;
+import br.com.manygames.agenda.sync.AlunoSincronizador;
 
 public class AgendaMessagingService extends FirebaseMessagingService {
 
@@ -32,9 +33,8 @@ public class AgendaMessagingService extends FirebaseMessagingService {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 AlunoSync alunoSync = mapper.readValue(json, AlunoSync.class);
-                AlunoDAO dao = new AlunoDAO(this);
-                dao.sincroniza(alunoSync.getAlunos());
-                dao.close();
+                new AlunoSincronizador(AgendaMessagingService.this).sincroniza(alunoSync);
+
                 EventBus bus = EventBus.getDefault();
                 bus.post(new AtualizaListaAlunoEvent());
             } catch (IOException e) {
